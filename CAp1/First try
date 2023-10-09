@@ -1,0 +1,33 @@
+import logging
+from telegram import Update
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+
+TOKEN = '6603670730:AAHIfDhJVa46HBnaDgXsLac3pFjK8oHJt38'
+
+forbidden_keywords = ['badword1', 'badword2', 'badword3']
+
+
+def start(update: Update, context: CallbackContext):
+    update.message.reply_text('Welcome to the Chat Moderation Bot!')
+
+def message_handler(update: Update, context: CallbackContext):
+    message_text = update.message.text.lower()
+
+    if any(keyword in message_text for keyword in forbidden_keywords):
+        update.message.delete()
+
+def main():
+    updater = Updater(TOKEN, use_context=True)
+    dp = updater.dispatcher
+
+    dp.add_handler(CommandHandler("start", start))
+
+    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, message_handler))
+
+    updater.start_polling()
+    updater.idle()
+
+if __name__ == '__main__':
+    main()
